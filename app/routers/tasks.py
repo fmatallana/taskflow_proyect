@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
 from sqlmodel import select
 
-from .db import Sessiondep
-from .models import Task, TaskCreate, TaskUpdate
+from app.database import Sessiondep
+from app.models.tasks import Task, TaskCreate, TaskUpdate
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -26,7 +26,7 @@ async def get_tasks_for_project(project_id: int, session: Sessiondep):
     tasks = session.exec(statement).all()
     if not tasks:
         raise HTTPException(
-            status_code=202, detail=f"No hay tasks con el id {project_id}"
+            status_code=404, detail=f"No hay tasks con el id {project_id}"
         )
     return tasks
 
@@ -45,3 +45,15 @@ async def update_tasks(tasks_data: TaskUpdate, session: Sessiondep, task_id: int
     session.commit()
     session.refresh(tasks_db)
     return tasks_db
+
+
+@router.delete("/{task_id}")
+async def delete_tasks(session: Sessiondep, task_id: int):
+    tasks_db = session.get(Task, task_id)
+    if not tasks_db:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Tasks doesn´t exist"
+        )
+    session.delete(tasks_db)
+    session.commit()
+    return {"detail": "ok"}

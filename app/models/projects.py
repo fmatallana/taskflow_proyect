@@ -1,7 +1,10 @@
+from typing import TYPE_CHECKING
+
 from sqlmodel import Field, Relationship, SQLModel
 
-from .tasks import Task
-from .users import User
+if TYPE_CHECKING:
+    from app.models.tasks import Task
+    from app.models.users import User
 
 
 class ProjectBase(SQLModel):
@@ -10,9 +13,9 @@ class ProjectBase(SQLModel):
 
 
 class Project(ProjectBase, table=True):
-    id: int | None = Field(primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     user_id: int | None = Field(
-        foreign_key="User.id"
+        foreign_key="user.id"
     )  # Foreign Key apuntando al modelo User.id y a su id
     user: "User" = Relationship(
         back_populates="projects"

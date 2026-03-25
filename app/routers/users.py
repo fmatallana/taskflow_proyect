@@ -1,7 +1,7 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, HTTPException, status
 
-from .db import Sessiondep
-from .models import User, UserCreate
+from app.database import Sessiondep
+from app.models.users import User, UserBase, UserCreate
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -20,4 +20,12 @@ async def create_user(user_data: UserCreate, session: Sessiondep):
     session.add(user)
     session.commit()
     session.refresh(user)
+    return user
+
+
+@router.get("/{user_id}", response_model=UserBase)
+async def get_user(user_id: int, session: Sessiondep):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail=f"No hay users con el id {user_id}")
     return user

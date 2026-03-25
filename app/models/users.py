@@ -1,8 +1,9 @@
-from typing import List
+from typing import TYPE_CHECKING, List
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from .projects import Project
+if TYPE_CHECKING:
+    from app.models.projects import Project
 
 
 class UserBase(SQLModel):
