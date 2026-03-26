@@ -2,6 +2,8 @@ from typing import TYPE_CHECKING
 
 from sqlmodel import Field, Relationship, SQLModel
 
+# 🔒 TYPE_CHECKING: Importaciones solo para type hints (no en runtime)
+# Evita circular imports con Project (Project -> Task, Task -> Project)
 if TYPE_CHECKING:
     from app.models.projects import Project
 
