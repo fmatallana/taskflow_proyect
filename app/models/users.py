@@ -31,3 +31,8 @@ UserCreate: Hereda lo de Base, y le agregamos el password en texto plano.
 
 Al separar esto, logramos que cuando el cliente se registre enviando el JSON, FastAPI valide que no nos esté intentando inyectar un id falso o proyectos que no le corresponden. El esquema UserCreate actúa como un filtro de seguridad. 🛡️
     """
+
+
+class UserValidate(SQLModel):
+    username: str
+    password: str

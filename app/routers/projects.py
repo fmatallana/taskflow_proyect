@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 
+# 🔵 IMPORTACIONES ABSOLUTAS (app.xxx)
+# Cambio de importaciones relativas (from ..db import) a absolutas para evitar circular imports
 from app.database import Sessiondep
 from app.models.projects import Project, ProjectBase, ProjectCreate
 

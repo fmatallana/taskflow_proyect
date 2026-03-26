@@ -1,8 +1,11 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import select
 
+# 🔵 IMPORTACIONES ABSOLUTAS (app.xxx)
+# Cambio de importaciones relativas (from ..db import) a absolutas para evitar circular imports
 from app.database import Sessiondep
 from app.models.tasks import Task, TaskCreate, TaskUpdate
+from app.security import obtener_usuario_actual
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
@@ -10,7 +13,14 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 @router.post(
     "/project/{project_id}", response_model=Task, status_code=status.HTTP_201_CREATED
 )
-async def create_tasks(tasks_data: TaskCreate, session: Sessiondep, project_id: int):
+async def create_tasks(
+    tasks_data: TaskCreate,
+    session: Sessiondep,
+    project_id: int,
+    usuario_actual: str = Depends(
+        obtener_usuario_actual
+    ),  # esto le indica a FastAPI que esta acción depende de nuestro guardia
+):
     tasks_data = tasks_data.model_dump()
     tasks_data["project_id"] = project_id
     tasks = Task.model_validate(tasks_data)

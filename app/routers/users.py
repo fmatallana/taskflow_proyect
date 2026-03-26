@@ -1,18 +1,23 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlmodel import select
 
+# 🔵 IMPORTACIONES ABSOLUTAS (app.xxx)
+# Cambio de importaciones relativas (from ..db import) a absolutas para evitar circular imports
 from app.database import Sessiondep
 from app.models.users import User, UserBase, UserCreate
+from app.security import (
+    crear_token_acceso,
+    encriptar_contrasena,
+    verificacion_de_contrasena,
+)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-def fake_hash_password(password: str) -> str:
-    return f"super_secret_{password}"
-
-
 @router.post("/", response_model=User, status_code=status.HTTP_201_CREATED)
 async def create_user(user_data: UserCreate, session: Sessiondep):
-    hashed_password = fake_hash_password(user_data.password)
+    hashed_password = encriptar_contrasena(user_data.password)
     user_dict = user_data.model_dump()
     user_dict["hashed_password"] = hashed_password
     user = User.model_validate(user_dict)
@@ -29,3 +34,28 @@ async def get_user(user_id: int, session: Sessiondep):
     if not user:
         raise HTTPException(status_code=404, detail=f"No hay users con el id {user_id}")
     return user
+
+
+@router.post("/login")
+async def user_validate(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    session: Sessiondep = None,
+    # Cambiamos a OAuth2PasswordRequestForm para que el endpoint sea compatible
+    # con el estándar OAuth2 y el botón 'Authorize' de Swagger.
+    # A diferencia de un JSON común, este esquema espera los datos como un
+    # formulario (form-data), extrayendo automáticamente 'username' y 'password'.
+):
+    statement = select(User).where(User.username == form_data.username)
+    user_db = session.exec(statement).first()
+    if not user_db:
+        raise HTTPException(
+            status_code=401, detail=f"No hay users con el id {form_data.username}"
+        )
+    verificar_contraseña = verificacion_de_contrasena(
+        form_data.password, user_db.hashed_password
+    )
+    if not verificar_contraseña:
+        raise HTTPException(status_code=401, detail="contraseña incorrecta")
+    else:
+        token_generado = crear_token_acceso({"sub": user_db.username})
+        return {"access_token": token_generado, "token_type": "bearer"}
