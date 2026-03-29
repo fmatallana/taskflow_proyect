@@ -1,27 +1,54 @@
-annotated-doc==0.0.4
-annotated-types==0.7.0
-anyio==4.13.0
-bcrypt==3.2.2
-cffi==2.0.0
-click==8.3.1
-fastapi==0.135.2
-greenlet==3.3.2
-h11==0.16.0
-idna==3.11
-iniconfig==2.3.0
-packaging==26.0
-passlib==1.7.4
-pluggy==1.6.0
-pycparser==3.0
-pydantic==2.12.5
-pydantic_core==2.41.5
-Pygments==2.19.2
-PyJWT==2.12.1
-pytest==9.0.2
-python-multipart==0.0.22
-SQLAlchemy==2.0.48
-sqlmodel==0.0.37
-starlette==1.0.0
-typing-inspection==0.4.2
-typing_extensions==4.15.0
-uvicorn==0.42.0
+# ============================================================================
+# TaskFlow - Requirements File
+# ============================================================================
+# Python 3.8+
+# Last Updated: March 2026
+# ============================================================================
+
+# Core Framework
+# ============================================================================
+fastapi==0.135.2          # Modern async web framework
+uvicorn==0.42.0           # ASGI server
+starlette==1.0.0          # Foundation for FastAPI
+
+# Data Validation & Serialization
+# ============================================================================
+pydantic==2.12.5          # Data validation using Python type annotations
+pydantic_core==2.41.5     # Core validation engine
+annotated-types==0.7.0    # Support for annotated types
+typing-inspection==0.4.2  # Utilities for inspecting type hints
+typing_extensions==4.15.0  # Typing extensions for Python 3.8+
+
+# Database & ORM
+# ============================================================================
+SQLAlchemy==2.0.48        # SQL toolkit and Object-Relational Mapping
+sqlmodel==0.0.37          # SQL databases in Python with SQLModel
+greenlet==3.3.2           # Lightweight pseudothreads for database connections
+
+# Security & Authentication
+# ============================================================================
+pyJWT==2.12.1             # JSON Web Token implementation
+bcrypt==3.2.2             # Password hashing library
+passlib==1.7.4            # Password hashing framework
+
+# HTTP & Async Utilities
+# ============================================================================
+annotated-doc==0.0.4      # Documentation for annotated types
+anyio==4.13.0             # Async compatibility library
+click==8.3.1              # Command-line interface creation
+h11==0.16.0               # HTTP/1.1 parser and encoder
+idna==3.11                # IDNA codec for internationalized domain names
+python-multipart==0.0.22  # Multipart form data parsing
+
+# C Extensions Support
+# ============================================================================
+cffi==2.0.0               # C Foreign Function Interface
+pycparser==3.0            # C parser in Python
+
+# Development & Testing
+# ============================================================================
+pytest==9.0.2             # Testing framework
+iniconfig==2.3.0          # Configuration parser
+packaging==26.0           # Package version handling
+pluggy==1.6.0             # Plugin system
+Pygments==2.19.2          # Syntax highlighting

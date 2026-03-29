@@ -5,6 +5,7 @@ from sqlmodel import select
 # Cambio de importaciones relativas (from ..db import) a absolutas para evitar circular imports
 from app.database import Sessiondep
 from app.models.tasks import Task, TaskCreate, TaskUpdate
+from app.models.users import User
 from app.security import obtener_usuario_actual
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
@@ -17,12 +18,15 @@ async def create_tasks(
     tasks_data: TaskCreate,
     session: Sessiondep,
     project_id: int,
-    usuario_actual: str = Depends(
+    usuario_actual: User = Depends(
         obtener_usuario_actual
     ),  # esto le indica a FastAPI que esta acción depende de nuestro guardia
 ):
     tasks_data = tasks_data.model_dump()
     tasks_data["project_id"] = project_id
+    tasks_data["user_id"] = (
+        usuario_actual.id
+    )  # Agregamos la llave 'user_id' al diccionario con el ID extraído del objeto 'usuario_actual'
     tasks = Task.model_validate(tasks_data)
     session.add(tasks)
     session.commit()

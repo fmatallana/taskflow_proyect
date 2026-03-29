@@ -16,6 +16,7 @@ class TaskBase(SQLModel):
 class Task(TaskBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     project_id: int = Field(foreign_key="project.id")
+    user_id: int = Field(foreign_key="user.id")
     project: "Project" = Relationship(
         back_populates="tasks"
     )  # como una tarea solo pertenece a un proyecto se tipa project como un objeto unico

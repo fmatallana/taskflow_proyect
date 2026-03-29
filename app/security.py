@@ -6,6 +6,10 @@ import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
+from sqlmodel import select
+
+from app.database import Sessiondep
+from app.models.users import User
 
 SECRET_KEY = "98U9EOPDIJASDSNKJ0324R"
 ALGORITHM = "HS256"
@@ -55,7 +59,7 @@ def verificar_token(token: str):
     # En resumen: la función toma la cadena cifrada, verifica que nuestra firma sea válida y, si lo es, nos devuelve la información del usuario que estaba oculta dentro.
 
 
-def obtener_usuario_actual(token: str = Depends(oauth2_scheme)):
+def obtener_usuario_actual(session: Sessiondep, token: str = Depends(oauth2_scheme)):
     try:
         # PASO 1: Usa tu función 'verificar_token' pasándole la variable 'token'
         # y guarda el resultado en una variable llamada 'payload'.
@@ -66,12 +70,14 @@ def obtener_usuario_actual(token: str = Depends(oauth2_scheme)):
 
         username = payload.get("sub")
         # --- El resto del código te protege de errores ---
-        if username is None:
+        statement = select(User).where(User.username == username)
+        user = session.exec(statement).first()
+        if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="No se pudo validar las credenciales",
+                detail="El usuario ya no existe",
             )
-        return username
+        return user
 
     except jwt.PyJWTError:  # Esto atrapa tokens vencidos o falsos
         raise HTTPException(
